@@ -41,4 +41,19 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    
+    // User has many apps
+    public function apps(){
+        return $this->hasMany(App::class);
+    }
+    
+    // User has many orders through apps
+    public function orders(){
+        return $this->hasManyThrough(Order::class, App::class);
+    }
+    
+    // Get transactions count
+    public function transactions(){
+        return $this->join('transactions', 'transactions.order_id', '=', 'orders.id')->count();
+    }
 }
