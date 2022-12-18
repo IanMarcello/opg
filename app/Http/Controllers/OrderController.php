@@ -69,8 +69,8 @@ class OrderController extends Controller
                 'input_Currency' => 'TZS',
                 'input_CustomerMSISDN' => $data['phone_number'], // replace with your phone number
                 'input_ServiceProviderCode' => '000000', // replace with your service provider code given by M-Pesa
-                'input_ThirdPartyConversationID' => 'rasderekf', // unique
-                'input_TransactionReference' => 'asdodfdferre', // unique
+                'input_ThirdPartyConversationID' => $payload['third_party_id'], // unique
+                'input_TransactionReference' => $payload['pay_number'], // unique
                 'input_PurchasedItemsDesc' => 'Test Item',
             ]);
         } catch(\Throwable $t){
