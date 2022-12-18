@@ -32,7 +32,7 @@ class OrderController extends Controller
             'amount' => 'required|numeric',
             'type' => 'string',
             'remark' => 'string|max:255',
-            'app_id' => 'required|integer'
+            'app_id' => 'integer'
         ]);
         
         //Writing to the log
