@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('third_party_id');
             $table->float('total_amount', 8, 2);
             $table->string('currency')->default('TZS');
-            $table->string('status')->default('PENDING'); // PENDING-PAID-DISBURSED
+            $table->string('status')->default('PENDING'); // FAILED-PAID-DISBURSED
             $table->text('remark')->nullable();
             $table->string('mno')->nullable();
             $table->string('buyer')->nullable();
