@@ -78,6 +78,16 @@ class OrderController extends Controller
             Log::error('MPesa C2B request failed');
             Log::error($response);
             return '{message:"failed"}';
+           
+            // Create a failed transaction
+            Transaction::create([
+            'third_party_id' => $response['input_ThirdPartyConversationID'],
+            'amount' => $data['amount'],
+            'currency' => 'TZS',
+            'status' => 'FAILED',
+            'remark' => null,
+            'order_id' => $order->id,
+        ]);
         }
         
         //Writing to the log
@@ -86,17 +96,17 @@ class OrderController extends Controller
         //Update the order status
         $order->update(['status' => 'PAID']);
         
-        //Create transaction
+        //Create a successful transaction
         Transaction::create([
             'third_party_id' => $response['input_ThirdPartyConversationID'],
             'amount' => $data['amount'],
             'currency' => 'TZS',
-            'status' => 'COMPLETE',
+            'status' => 'SUCCESSFUL',
             'remark' => null,
             'order_id' => $order->id,
         ]);
         
-        //The disbursed transaction created
+        //Create the disbursed transaction
         Transaction::create([
             'third_party_id' => $response['input_ThirdPartyConversationID'],
             'amount' => $data['amount'],
