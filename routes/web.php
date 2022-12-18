@@ -12,19 +12,21 @@ use Openpesa\Pesa\Facades\Pesa;
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
-*/
-
 Route::get('/', function () {
     return redirect()->route('api.orders.show');
 });
 
+*/
+
 Route::get('/test-api', function () {
+    
     $data = [
         'firstName' => 'Levina',
         'lastName' => 'Pamba',
         'amount' => 100000,
         'phone_number' => '255762897200'
     ];
+    
     $response = Pesa::c2b([
         'input_Amount' => $data['amount'], // Amount to be charged
         'input_Country' => 'TZN',
@@ -35,5 +37,6 @@ Route::get('/test-api', function () {
         'input_TransactionReference' => 'asdodfdferre', // unique
         'input_PurchasedItemsDesc' => 'Test Item',
     ]);
+    
     dd($response);
 });
