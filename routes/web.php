@@ -24,7 +24,7 @@ Route::get('/test-api', function () {
         'firstName' => 'Levina',
         'lastName' => 'Pamba',
         'amount' => 100000,
-        'phone_number' => '255762897200'
+        'phone_number' => '0762897200'
     ];
     
     $response = Pesa::c2b([
