@@ -60,7 +60,7 @@ class OrderController extends Controller
         Log::info('Order saved');
         Log::info($order);
         
-        $response =[];
+        $response = [];
         try{
             //MPesa C2b transaction
             $response = Pesa::c2b([
@@ -69,8 +69,8 @@ class OrderController extends Controller
                 'input_Currency' => 'TZS',
                 'input_CustomerMSISDN' => $data['phone_number'], // replace with your phone number
                 'input_ServiceProviderCode' => '000000', // replace with your service provider code given by M-Pesa
-                'input_ThirdPartyConversationID' => $payload['third_party_id'], // unique
-                'input_TransactionReference' => $payload['pay_number'], // unique
+                'input_ThirdPartyConversationID' => 'rasderekf', // unique
+                'input_TransactionReference' => 'asdodfdferre', // unique
                 'input_PurchasedItemsDesc' => 'Test Item',
             ]);
         } catch(\Throwable $t){
@@ -89,16 +89,21 @@ class OrderController extends Controller
             'order_id' => $order->id,
         ]);
         }
+
+        Log::info($response);
         
         //Writing to the log
         Log::info('Pesa C2B request successful');
         
         //Update the order status
         $order->update(['status' => 'PAID']);
+
+        //Writing to the log
+        Log::info('Creating transaction');
         
         //Create a successful transaction
         Transaction::create([
-            'third_party_id' => $response['input_ThirdPartyConversationID'],
+            'third_party_id' => $payload['third_party_id'],
             'amount' => $data['amount'],
             'currency' => 'TZS',
             'status' => 'SUCCESSFUL',
@@ -108,13 +113,16 @@ class OrderController extends Controller
         
         //Create the disbursed transaction
         Transaction::create([
-            'third_party_id' => $response['input_ThirdPartyConversationID'],
+            'third_party_id' => $payload['third_party_id'],
             'amount' => $data['amount'],
             'currency' => 'TZS',
             'status' => 'DISBURSED',
             'remark' => null,
             'order_id' => $order->id,
         ]);
+
+        //Writing to the log
+        Log::info('Transaction disbursed');
         
         return '{message:"ok"}';
     }
