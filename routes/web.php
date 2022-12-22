@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use Openpesa\Pesa\Facades\Pesa;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,31 +12,20 @@ use Openpesa\Pesa\Facades\Pesa;
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
-Route::get('/', function () {
-    return redirect()->route('api.orders.show');
-});
-
 */
 
-Route::get('/test-api', function () {
-    
-    $data = [
-        'firstName' => 'Levina',
-        'lastName' => 'Pamba',
-        'amount' => 100000,
-        'phone_number' => '255762897200'
-    ];
-    
-    $response = Pesa::c2b([
-        'input_Amount' => $data['amount'], // Amount to be charged
-        'input_Country' => 'TZN',
-        'input_Currency' => 'TZS',
-        'input_CustomerMSISDN' => $data['phone_number'], // replace with your phone number
-        'input_ServiceProviderCode' => '000000', // replace with your service provider code given by M-Pesa
-        'input_ThirdPartyConversationID' => 'rasderekf', // unique
-        'input_TransactionReference' => 'asdodfdferre', // unique
-        'input_PurchasedItemsDesc' => 'Test Item',
-    ]);
-    
-    dd($response);
+Route::get('/', function () {
+    return view('welcome');
 });
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
