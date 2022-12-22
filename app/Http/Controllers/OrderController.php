@@ -25,8 +25,8 @@ class OrderController extends Controller
         
         //Data from app request
         $data = $request->validate([
-            'firstName' => 'required|string',
-            'lastName' => 'required|string',
+            'firstName' => 'required|string|max:255',
+            'lastName' => 'required|string|max:255',
             'phone_number' => 'required|string',
             'email' => 'email',
             'amount' => 'required|numeric',
@@ -50,8 +50,11 @@ class OrderController extends Controller
             'mno' => $data['mno'] ?? 'MPesa',
             'buyer' => $data['firstName']." ".$data['lastName'],
             'type' => $data['type'] ?? 'FIXED',
-            'app_id' => $data['app_id'] ?? 1,
+            'app_id' => $data['app_id'] ?? 2,
         ];
+        
+        //
+        Log::info('Creating order');
         
         //Create order
         $order = Order::create($payload);
@@ -77,20 +80,19 @@ class OrderController extends Controller
             //Writing to the log
             Log::error('MPesa C2B request failed');
             Log::error($response);
-            return '{message:"failed"}';
-           
+            
             // Create a failed transaction
             Transaction::create([
-            'third_party_id' => $response['input_ThirdPartyConversationID'],
-            'amount' => $data['amount'],
-            'currency' => 'TZS',
-            'status' => 'FAILED',
-            'remark' => null,
-            'order_id' => $order->id,
-        ]);
+                'third_party_id' => $response['input_ThirdPartyConversationID'],
+                'amount' => $data['amount'],
+                'currency' => 'TZS',
+                'status' => 'FAILED',
+                'remark' => null,
+                'order_id' => $order->id,
+            ]);
+            
+            return '{message:"failed"}';
         }
-
-        Log::info($response);
         
         //Writing to the log
         Log::info('Pesa C2B request successful');
