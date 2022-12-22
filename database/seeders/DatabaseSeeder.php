@@ -20,7 +20,5 @@ class DatabaseSeeder extends Seeder
     {
         User::factory(10)->create();
         App::factory(10)->create();
-        Order::factory(10)->create();
-        Transaction::factory(10)->create();
     }
 }
