@@ -26,8 +26,6 @@ class UserTable extends DataTableComponent
                 ->sortable(),
             Column::make("Phone number", "phone_number")
                 ->sortable(),
-            Column::make("Nin", "nin")
-                ->sortable(),
             Column::make("Created at", "created_at")
                 ->sortable(),
             Column::make("Updated at", "updated_at")
