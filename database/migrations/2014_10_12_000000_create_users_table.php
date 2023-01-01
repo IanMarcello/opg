@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('nin')->nullable();
             //$table->timestamp('nin_verified_at')->nullable();
             $table->string('role')->default('Client');
+            $table->boolean('status')->default(true);
             $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
