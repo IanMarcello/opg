@@ -22,7 +22,7 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'phone_number' => fake()->regexify('[0]{1}[6-7]{1}[1-9]{8}'),
-            'nin' => fake()->numerify('########-#####-#####-##'),
+            'nin' => fake()->numerify('####################'),
             'password' => Hash::make('1234567890'), // password
             //'remember_token' => Str::random(10),
         ];
