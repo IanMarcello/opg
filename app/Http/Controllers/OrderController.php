@@ -11,18 +11,20 @@ use Openpesa\Pesa\Facades\Pesa;
 
 class OrderController extends Controller
 {
-    
-    public function index(){
+
+    public function index()
+    {
         return response()->json(Order::all());
     }
-    
-    public function create(StoreOrderRequest $request){
-        
+
+    public function create(StoreOrderRequest $request)
+    {
+
         //Writing to the log
         Log::info('Creating order');
         Log::info($request->all());
         Log::info('Validating request payload');
-        
+
         //Data from app request
         $data = $request->validate([
             'firstName' => 'required|string|max:255',
@@ -34,37 +36,37 @@ class OrderController extends Controller
             'remark' => 'string|max:255',
             'app_id' => 'integer'
         ]);
-        
+
         //Writing to the log
         Log::info('Payload validated');
         Log::info('Saving order');
-        
+
         //Payload array
         $payload = [
-            'pay_number' => 'ODR-'.Str::random(6),
+            'pay_number' => 'ODR-' . Str::random(6),
             'third_party_id' => Str::random(5),
             'total_amount' => (float) $data['amount'],
             'currency' => 'TZS',
             'status' => 'PENDING',
             'remark' => $data['remark'] ?? null,
             'mno' => $data['mno'] ?? 'MPesa',
-            'buyer' => $data['firstName']." ".$data['lastName'],
+            'buyer' => $data['firstName'] . " " . $data['lastName'],
             'type' => $data['type'] ?? 'FIXED',
             'app_id' => $data['app_id'] ?? 2,
         ];
-        
+
         //
         Log::info('Creating order');
-        
+
         //Create order
         $order = Order::create($payload);
-        
+
         //Writing to the log
         Log::info('Order saved');
         Log::info($order);
-        
+
         $response = [];
-        try{
+        try {
             //MPesa C2b transaction
             $response = Pesa::c2b([
                 'input_Amount' => $data['amount'], // Amount to be charged
@@ -76,11 +78,11 @@ class OrderController extends Controller
                 'input_TransactionReference' => 'asdodfdferre', // unique
                 'input_PurchasedItemsDesc' => 'Test Item',
             ]);
-        } catch(\Throwable $t){
+        } catch (\Throwable $t) {
             //Writing to the log
             Log::error('MPesa C2B request failed');
             Log::error($response);
-            
+
             // Create a failed transaction
             Transaction::create([
                 'third_party_id' => $response['input_ThirdPartyConversationID'],
@@ -90,19 +92,19 @@ class OrderController extends Controller
                 'remark' => null,
                 'order_id' => $order->id,
             ]);
-            
+
             return '{message:"failed"}';
         }
-        
+
         //Writing to the log
         Log::info('Pesa C2B request successful');
-        
+
         //Update the order status
         $order->update(['status' => 'PAID']);
 
         //Writing to the log
         Log::info('Creating transaction');
-        
+
         //Create a successful transaction
         Transaction::create([
             'third_party_id' => $payload['third_party_id'],
@@ -112,7 +114,7 @@ class OrderController extends Controller
             'remark' => null,
             'order_id' => $order->id,
         ]);
-        
+
         //Create the disbursed transaction
         Transaction::create([
             'third_party_id' => $payload['third_party_id'],
@@ -125,10 +127,10 @@ class OrderController extends Controller
 
         //Writing to the log
         Log::info('Transaction disbursed');
-        
+
         return '{message:"ok"}';
     }
-    
+
     public function show(Order $order)
     {
         return response()->json(200);
